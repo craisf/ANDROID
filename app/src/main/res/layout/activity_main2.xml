@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:context=".Main">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bienvenido a la Veterinaria Patitas Felices"
+        android:textSize="20dp"
+        android:textAlignment="center"/>
+
+
+    <Button
+        android:id="@+id/btRegistrarCliente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Registrar Cliente"
+        android:layout_gravity="center" />
+
+    <Button
+        android:id="@+id/btRegistrarMascota"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Registrar Mascota"
+        android:layout_gravity="center" />
+    <Button
+        android:id="@+id/btBuscarCliente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Buscar Cliente"
+        android:layout_gravity="center" />
+    <Button
+        android:id="@+id/btDatosMascota"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Datos Mascota"
+        android:layout_gravity="center" />
+
+
+</LinearLayout>
