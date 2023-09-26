@@ -18,7 +18,7 @@
 
 
     <EditText
-        android:id="@+id/editTextText"
+        android:id="@+id/etUsuario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -27,7 +27,7 @@
         android:hint="nombre de usuario" />
 
     <EditText
-        android:id="@+id/editTextTextPassword"
+        android:id="@+id/etContrasena"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Button" />
+        android:text="Iniciar sesion" />
 
 
 </LinearLayout>

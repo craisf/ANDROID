@@ -9,7 +9,6 @@
     tools:context=".Main">
 
     <TextView
-        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Bienvenido a la Veterinaria Patitas Felices"
@@ -36,12 +35,7 @@
         android:layout_height="wrap_content"
         android:text="Buscar Cliente"
         android:layout_gravity="center" />
-    <Button
-        android:id="@+id/btDatosMascota"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Datos Mascota"
-        android:layout_gravity="center" />
+
 
 
 </LinearLayout>
