@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -47,7 +48,6 @@ public class RegistrarMascota extends AppCompatActivity {
     ImageView ivFotografia;
     Button btBuscarCliente, btSeleccionarFoto, btRegistrarMascota, btQuitarFoto;
     String idcliente, idraza, nombreMascota, fotografia, color, genero;
-    final String URL_2 = "https://192.168.56.1/veterinaria/controller/";
     List<String> listaRazas = new ArrayList<>();
     private List<String> idRazas = new ArrayList<>();
 
@@ -130,33 +130,37 @@ public class RegistrarMascota extends AppCompatActivity {
             }
         }
     }
+
     private void buscarcliente(){
         String dni = etDNIBuscar.getText().toString().trim();
-        String URL = URL_2 + "cliente.php?operacion=searh&dni=" + dni;
+        String URL = Utils.URL + "cliente.controller.php?operacion=search&dni=" + dni;
+
         if (dni.isEmpty() || dni.length()<8){
             Toast.makeText(getApplicationContext(), "Escriba el DNI", Toast.LENGTH_SHORT).show();
         }else{
             StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    if (!response.equals("false")) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        if (jsonArray.length() > 0) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(0);
                             idcliente = jsonObject.getString("idcliente");
                             String nombreCompleto = jsonObject.getString("nombres") + " " + jsonObject.getString("apellidos");
                             etNombresDueno.setText(nombreCompleto);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Cliente no encontrado", Toast.LENGTH_SHORT).show();
+                            etNombresDueno.setText(null);
                         }
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Cliente no encontrado", Toast.LENGTH_SHORT).show();
-                        etNombresDueno.setText(null);
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Error en el formato de la respuesta JSON", Toast.LENGTH_SHORT).show();
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(getApplicationContext(), "Problema con el servidor", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Problemas al buscar", Toast.LENGTH_SHORT).show();
                 }
             });
             Volley.newRequestQueue(this).add(jsonObjectRequest);
@@ -164,7 +168,7 @@ public class RegistrarMascota extends AppCompatActivity {
     }
 
     private void obtenerRazas(){
-        String URL = URL_2 + "mascota.php?operacion=listRacelistRace";
+        String URL = Utils.URL + "mascota.controller.php?operacion=listRace";
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
             @Override
@@ -187,14 +191,14 @@ public class RegistrarMascota extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "Problema con el servidor", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Problema al obtener razas", Toast.LENGTH_SHORT).show();
             }
         });
         Volley.newRequestQueue(this).add(jsonArrayRequest);
     }
 
     private void registrarMascota(){
-        String URL =  URL_2 + "mascota.php";
+        String URL =  Utils.URL + "mascota.controller.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -209,24 +213,24 @@ public class RegistrarMascota extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "Problema con el servidor", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Problemas al registrar", Toast.LENGTH_SHORT).show();
             }
         }){
             @Nullable
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("operacion", "add");
-                params.put("idcliente", idcliente);
-                params.put("idraza", idraza);
-                params.put("nombreMascota", nombreMascota);
-                params.put("color", color);
-                params.put("genero", genero);
-                params.put("fotografia", fotografia);
-                return params;
+                Map<String, String> parametros = new HashMap<>();
+                parametros.put("operacion", "add");
+                parametros.put("idcliente", idcliente);
+                parametros.put("idraza", idraza);
+                parametros.put("nombreMascota", nombreMascota);
+                parametros.put("fotografia", fotografia);
+                parametros.put("color", color);
+                parametros.put("genero", genero);
+                return parametros;
             }
         };
-        Volley.newRequestQueue(this).add(stringRequest);
+            Volley.newRequestQueue(this).add(stringRequest);
     }
 
     private void validarData() {
@@ -234,6 +238,7 @@ public class RegistrarMascota extends AppCompatActivity {
         color = etColor.getText().toString().trim();
         genero = rbMacho.isChecked() ? "M" : "H";
         fotografia = ivFotografia.getDrawable() != null ? getStringImagen(bitmap) : "";
+        Log.d("Valores de solicitud", "nombreMascota: " + nombreMascota + ", color: " + color + ", genero: " + genero);
 
         if (idcliente.isEmpty() || idraza.isEmpty() || nombreMascota.isEmpty() || color.isEmpty() || genero.isEmpty()) {
             Toast.makeText(getApplicationContext(),"Complete los campos", Toast.LENGTH_SHORT).show();

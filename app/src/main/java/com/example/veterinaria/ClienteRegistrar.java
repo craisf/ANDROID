@@ -62,7 +62,7 @@ public class ClienteRegistrar extends AppCompatActivity {
     }
 
     private void registrar(){
-        String URL = Utils.URL + "cliente.php";
+        String URL = Utils.URL + "cliente.controller.php";
         int tiempoDeEsperaEnMilisegundos = 10000; // 10 segundos
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override

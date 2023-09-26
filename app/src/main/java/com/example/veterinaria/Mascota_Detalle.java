@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +23,6 @@ public class Mascota_Detalle extends AppCompatActivity {
     TextView tvMascotaNombre,tvAnimal,tvRaza,tvColor,tvGenero ;
     ImageView ivfotoMascota;
     int idMascota;
-    final String URL_3 = "https://192.168.56.1/veterinaria/controller/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +30,14 @@ public class Mascota_Detalle extends AppCompatActivity {
         setContentView(R.layout.activity_mascota_detalle);
         loadUI();
 
-        Bundle params = this.getIntent().getExtras();
-        if (params != null) {
-            idMascota = params.getInt("idmascota");
+        Bundle parametros = this.getIntent().getExtras();
+        if (parametros != null) {
+            idMascota = parametros.getInt("idmascota");
             Obtenerdata(idMascota);
         }
     }
     private void Obtenerdata(int idmascota){
-        String URL = URL_3 + "mascota.php?operacion=search=idmascota" +  idmascota;
+        String URL = Utils.URL + "mascota.controller.php?operacion=search&idmascota" +  idmascota;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
@@ -51,6 +51,7 @@ public class Mascota_Detalle extends AppCompatActivity {
                     tvRaza.setText(response.getString("raza"));
                     tvColor.setText(response.getString("color"));
                     tvGenero.setText(response.getString("genero").equals("M") ? "Macho" : "Hembra");
+                    Log.d("datos", "nombremascota:" + tvMascotaNombre + "tvAnimal" + tvAnimal+ "tvRaza" + tvRaza+ "tvColor" + tvColor +  "tvGenero"+ tvGenero);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -65,7 +66,7 @@ public class Mascota_Detalle extends AppCompatActivity {
     }
 
     private void getImage(String  nameFile){
-        String URL = !nameFile.equals("null")? "https://192.168.56.1/veterinaria/image/" + nameFile : nameFile;
+        String URL = !nameFile.equals("null")? Utils.URLImages + nameFile : nameFile;
         ImageRequest imageRequest = new ImageRequest(URL, new Response.Listener<Bitmap>() {
             @Override
             public void onResponse(Bitmap response) {

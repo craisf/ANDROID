@@ -29,7 +29,7 @@ public class Mascota_Cliente_listar extends AppCompatActivity {
     EditText etDNIBuscar,dtDatosdueno;
     Button btBuscardueno;
     ListView lvMascotas;
-    final String URL_4 = "https://192.168.56.1/veterinaria/controller/";
+
 
     private List<Mascota> dataList = new ArrayList<>();
     private List<Integer> dataID = new ArrayList<>();
@@ -59,12 +59,13 @@ public class Mascota_Cliente_listar extends AppCompatActivity {
         });
     }
 
+
     private void obtenerMascota(String dni){
         dataID.clear();
         dataList.clear();
         adapter = new MascotaAdapter(this, dataList);
         lvMascotas.setAdapter(adapter);
-        String URL = URL_4 + "mascota.php?operacion=searchPetOwner&dni=" + dni;
+        String URL = Utils.URL + "mascota.controller.php?operacion=searchPetOwner&dni=" + dni;
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -94,28 +95,30 @@ public class Mascota_Cliente_listar extends AppCompatActivity {
     }
     private void buscarCliente(){
         dni = etDNIBuscar.getText().toString().trim();
-        String URL = URL_4 + "cliente.php?operacion=search&dni=" + dni;
+        String URL = Utils.URL + "cliente.controller.php?operacion=search&dni=" + dni;
         if(dni.isEmpty()|| dni.length()<8){
             Toast.makeText(getApplicationContext(), "Escriba el dni", Toast.LENGTH_SHORT).show();
         }else{
             StringRequest jsonObjectRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    if (!response.equals("false")) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        if (jsonArray.length() > 0) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(0);
                             String nombreCompleto = jsonObject.getString("nombres") + " " + jsonObject.getString("apellidos");
                             dtDatosdueno.setText(nombreCompleto);
                             obtenerMascota(dni);
-                        }catch (JSONException e) {
-                            e.printStackTrace();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Cliente no encontrado", Toast.LENGTH_SHORT).show();
+                            dtDatosdueno.setText(null);
+                            dataID.clear();
+                            dataList.clear();
+                            adapter.notifyDataSetChanged();
                         }
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Cliente no encontrado", Toast.LENGTH_SHORT).show();
-                        dtDatosdueno.setText(null);
-                        dataID.clear();
-                        dataList.clear();
-                        adapter.notifyDataSetChanged();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Error en el formato de la respuesta JSON", Toast.LENGTH_SHORT).show();
                     }
                 }
             }, new Response.ErrorListener() {

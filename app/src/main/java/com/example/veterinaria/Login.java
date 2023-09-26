@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +20,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,14 +45,14 @@ public class Login extends AppCompatActivity {
         boolean usuario = etUsuario.getText().toString().trim().isEmpty();
         boolean contrasena = etContrasena.getText().toString().trim().isEmpty();
         if(usuario || contrasena){
-            System.out.println("Usuario o contraseña incorrectos");
+            Toast.makeText(getApplicationContext(),"Usuario o contraseña incorrectos",Toast.LENGTH_SHORT).show();
         }else{
-            acceder();
+            login();
         }
     }
 
-    private void acceder(){
-        String URL  = Utils.URL + "cliente.php";
+    private void login(){
+        String URL  = Utils.URL + "cliente.controller.php";
         String usuario = etUsuario.getText().toString().trim();
         String contrasena = etContrasena.getText().toString().trim();
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
@@ -59,13 +61,18 @@ public class Login extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     boolean login = jsonObject.getBoolean("login");
-                    String nombre = jsonObject.getString("nombre") + "." + jsonObject.getString("apellidos");
-                    if (login) {
-                        Toast.makeText(getApplicationContext(), "Bienvenido" + nombre + ".", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getApplicationContext(), Main.class);
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+                    String nombre = jsonObject.getString("nombres") + " " + jsonObject.getString("apellidos");
+                    Log.e("Nombre", nombre);
+                    if(jsonObject.has("login")){
+                        if (login) {
+                            Toast.makeText(getApplicationContext(), "Bienvenido " + nombre + " . ", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), Main.class);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        Toast.makeText(getApplicationContext(),"Respuesta del servidor no valida", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -74,10 +81,15 @@ public class Login extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "Problemas con el servidor", Toast.LENGTH_SHORT).show();
+                String errorMessage = "Error desconocido";
+                if (error.networkResponse != null) {
+                    errorMessage = new String(error.networkResponse.data, Charset.defaultCharset());
+                }
+                Log.e("Error", errorMessage);
+                Toast.makeText(getApplicationContext(), "Error de red: " + errorMessage, Toast.LENGTH_SHORT).show();
             }
         }){
-            @Nullable
+
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> parametros = new HashMap<>();
@@ -85,9 +97,10 @@ public class Login extends AppCompatActivity {
                 parametros.put("username", usuario);
                 parametros.put("password", contrasena);
                 return parametros;
+
             }
         };
-        Volley.newRequestQueue(this).add(stringRequest);
+        Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
     }
 
     private void loadui(){

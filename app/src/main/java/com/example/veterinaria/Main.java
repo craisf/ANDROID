@@ -32,7 +32,7 @@ public class Main extends AppCompatActivity {
             public void onClick(View view) {
                 buscarCliente();
             }
-        })
+        });
 
     }
 
