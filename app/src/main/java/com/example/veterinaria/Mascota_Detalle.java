@@ -66,7 +66,7 @@ public class Mascota_Detalle extends AppCompatActivity {
     }
 
     private void getImage(String  nameFile){
-        String URL = !nameFile.equals("null")? Utils.URLImages + nameFile : nameFile;
+        String URL = !nameFile.equals("null")? Utils.URLImages + nameFile : "https://us.123rf.com/450wm/koblizeek/koblizeek2208/koblizeek220800128/190320173-sin-s%C3%ADmbolo-de-vector-de-imagen-falta-el-icono-disponible-no-hay-galer%C3%ADa-para-este-marcador-de.jpg";
         ImageRequest imageRequest = new ImageRequest(URL, new Response.Listener<Bitmap>() {
             @Override
             public void onResponse(Bitmap response) {

@@ -46,7 +46,7 @@ public class RegistrarMascota extends AppCompatActivity {
     Spinner spListaRazas;
     RadioButton rbMacho, rbHembra;
     ImageView ivFotografia;
-    Button btBuscarCliente, btSeleccionarFoto, btRegistrarMascota, btQuitarFoto;
+    Button btCLienteBuscar, btSeleccionarFoto, btRegistrarMascota, btQuitarFoto;
     String idcliente, idraza, nombreMascota, fotografia, color, genero;
     List<String> listaRazas = new ArrayList<>();
     private List<String> idRazas = new ArrayList<>();
@@ -60,7 +60,7 @@ public class RegistrarMascota extends AppCompatActivity {
         loadUI();
         obtenerRazas();
 
-        btBuscarCliente.setOnClickListener(new View.OnClickListener() {
+        btCLienteBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 buscarcliente();
@@ -68,16 +68,16 @@ public class RegistrarMascota extends AppCompatActivity {
         });
         spListaRazas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                idraza = idRazas.get(i);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                idraza = idRazas.get(position);
                 int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
                 if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                    ((TextView)adapterView.getChildAt(0)).setTextColor(Color.parseColor("#FFFFFF"));
+                    ((TextView)parent.getChildAt(0)).setTextColor(Color.parseColor("#FFFFFF"));
                 }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
+            public void onNothingSelected(AdapterView<?> parent) {
 
             }
         });
@@ -154,6 +154,7 @@ public class RegistrarMascota extends AppCompatActivity {
                         }
                     }catch (Exception e) {
                         e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         Toast.makeText(getApplicationContext(), "Error en el formato de la respuesta JSON", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -199,12 +200,13 @@ public class RegistrarMascota extends AppCompatActivity {
 
     private void registrarMascota(){
         String URL =  Utils.URL + "mascota.controller.php";
+        Log.d("dasd", URL);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if (response.isEmpty()) {
+                Log.d("dad", response);
+                if (!response.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "Problema al registrar", Toast.LENGTH_SHORT).show();
-
                 } else {
                     Toast.makeText(getApplicationContext(), "Registrado correctamente", Toast.LENGTH_SHORT).show();
                     resetUI();
@@ -214,6 +216,7 @@ public class RegistrarMascota extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getApplicationContext(), "Problemas al registrar", Toast.LENGTH_SHORT).show();
+                Log.d("sdas", error.getMessage());
             }
         }){
             @Nullable
@@ -238,7 +241,7 @@ public class RegistrarMascota extends AppCompatActivity {
         color = etColor.getText().toString().trim();
         genero = rbMacho.isChecked() ? "M" : "H";
         fotografia = ivFotografia.getDrawable() != null ? getStringImagen(bitmap) : "";
-        Log.d("Valores de solicitud", "nombreMascota: " + nombreMascota + ", color: " + color + ", genero: " + genero);
+        Log.d("Valores de solicitud", "cliente: " + idcliente + ", raza: " + idraza + ", nombre: " + nombreMascota+  "color: "+ color + "genero: " + genero);
 
         if (idcliente.isEmpty() || idraza.isEmpty() || nombreMascota.isEmpty() || color.isEmpty() || genero.isEmpty()) {
             Toast.makeText(getApplicationContext(),"Complete los campos", Toast.LENGTH_SHORT).show();
@@ -270,9 +273,9 @@ public class RegistrarMascota extends AppCompatActivity {
 
         ivFotografia = findViewById(R.id.ivFotografia);
 
-        btBuscarCliente = findViewById(R.id.btBuscarCliente);
+        btCLienteBuscar = findViewById(R.id.btCLienteBuscar);
         btSeleccionarFoto = findViewById(R.id.btSeleccionarFoto);
         btQuitarFoto = findViewById(R.id.btQuitarFoto);
-        btRegistrarMascota = findViewById(R.id.btRegistrarMascota);
+        btRegistrarMascota = findViewById(R.id.btMascotaRegistrar);
     }
 }
